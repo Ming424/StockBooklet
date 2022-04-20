@@ -127,7 +127,7 @@ function App() {
   });
 
   // STOCK
-  const [symbol, setSymbol] = useState("");
+  const [symbol, setSymbol] = useState("TSLA");
   const [quote, setQuote] = useState({});
   const [companyProfile, setCompanyProfile] = useState({});
   const [posts, setPosts] = useState([]);
@@ -153,6 +153,7 @@ function App() {
   // const stockUrl = `${proxyUrl}https://query1.finance.yahoo.com/v8/finance/chart/`;
 
   async function fetchGraph() {
+    console.log("() fetchGraph " + symbol)
     if (online) {
       const resolution = 1;
       // const f = 1650375000
@@ -558,7 +559,7 @@ function App() {
       console.log("(2) => uuseEffect.getLastestListQuote " + symbol);
       try {
         await fetchListQuote(watches[currentWatchList].lists);
-        await fetchQuote();
+        await fetchQuote('from loop');
       } catch (error) {
         console.log(error);
       }
@@ -571,14 +572,18 @@ function App() {
   }, [currentWatchList, symbol]);
 
   useEffect(() => {
+    console.log("SYMBOL ON CHANGE " + symbol)
+    setSeries([{ data: [] }]);
+    setSeriesVol([{ data: [] }]);
     fetchProfile();
-    fetchQuote();
+    fetchQuote('from symbol change');
     getProfileNews();
   }, [symbol]);
 
   useEffect(() => {
+    console.log("INITIALIZE")
     fetchProfile();
-    fetchQuote();
+    fetchQuote('from init');
     fetchListQuote(watches[currentWatchList].lists);
     getProfileNews();
   }, []);
@@ -605,6 +610,8 @@ function App() {
     const resNews = await axios.get(
       `https://finnhub.io/api/v1/company-news?symbol=${symbol}&from=${previousDt}&to=${currentDt}&token=${finnhubtoken}`
     );
+    console.log("===NEWS===")
+    console.log(resNews.data)
     let counter = 0;
     let tempPosts = [];
     for (const element of resNews.data) {
@@ -623,6 +630,7 @@ function App() {
     const res = await axios.get(
       `${url}/stock/profile2?symbol=${symbol}&token=${finnhubtoken}`
     );
+    console.log("===PROFILE===")
     setCompanyProfile(res.data);
     setLoading(false);
   };
@@ -646,19 +654,26 @@ function App() {
           cache.set(element.sym, res.data);
         }
       }
+      console.log("===LIST===")
+      console.log(temp)
       tempList[currentWatchList].lists = temp;
       setWatches(tempList);
     }
   };
 
-  const fetchQuote = async () => {
-    console.log("() fetchQuote " + symbol);
-    const currentSym = symbol;
-    const res = await axios.get(
-      `${url}/quote?symbol=${symbol}&token=${finnhubtoken}`
-    );
-    console.log(res.data);
-    setQuote(res.data);
+  const fetchQuote = async (info) => {
+    console.log("() fetchQuote " + symbol + " " + info);
+    console.log(symbol)
+    console.log(symbol.length)
+    if (symbol.length !== 0){
+      const currentSym = symbol;
+      const res = await axios.get(
+        `${url}/quote?symbol=${symbol}&token=${finnhubtoken}`
+      );
+      console.log("===QUOTE===")
+      console.log(res.data);
+      setQuote(res.data);
+    }
   };
 
   const listItemEditOnClick = (i) => {
