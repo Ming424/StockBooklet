@@ -1,12 +1,7 @@
 import React, { useMemo } from "react";
-import {
-  Row,
-  Button,
-  Container,
-  Stack,
-  Badge,
-  Image,
-} from "react-bootstrap/";
+import { Row, Button, Container, Stack, Badge, Image } from "react-bootstrap/";
+import { BiNote, BiNews, BiLinkAlt } from "react-icons/bi";
+import { AiOutlineStar, AiFillYahoo } from "react-icons/ai";
 
 export default function StockProfile(props) {
   const direction2 = useMemo(
@@ -22,24 +17,42 @@ export default function StockProfile(props) {
   return (
     <Container className="px-1">
       <Row className="mt-2">
-        <Stack direction="horizontal">
+        <Stack direction="horizontal" gap={1}>
           <Image
             className="main-header-image"
             src={props.companyProfile.logo}
+            data-cy="main-header-image"
           ></Image>
-          <div className="main-header-symbol">
+          <div className="main-header-symbol" data-cy="main-header-symbol">
             {"  "} {props.companyProfile.name} ({props.companyProfile.ticker})
           </div>
-          <Badge bg="primary" className="main-header-symbol-badge">
+          <Badge
+            bg="primary"
+            className="main-header-symbol-badge"
+            data-cy="main-header-country"
+          >
             {props.companyProfile.country}
           </Badge>
-          <Badge bg="secondary" className="main-header-symbol-badge">
+          <Badge
+            bg="secondary"
+            className="main-header-symbol-badge"
+            data-cy="main-header-exchange"
+          >
             {props.companyProfile.exchange}
           </Badge>
-          <Badge bg="info" className="main-header-symbol-badge">
+          <Badge
+            bg="info"
+            className="main-header-symbol-badge"
+            data-cy="main-header-finnhubIndustry"
+          >
             {props.companyProfile.finnhubIndustry}
           </Badge>
-          {/* <div disabled variant="outline-secondary" className="ms-auto mt-3">Future</div> */}
+          <Button disabled variant="outline-secondary" className="ms-auto mr-1">
+            <AiOutlineStar />
+          </Button>
+          <Button disabled variant="outline-secondary">
+            <BiNote />
+          </Button>
         </Stack>
       </Row>
       <Row className="my-4 justify-content-between">
@@ -63,18 +76,24 @@ export default function StockProfile(props) {
         </Stack>
       </Row>
       <Row className="my-3 justify-content-between">
-        <Stack direction="horizontal" gap={2}>
+        <Stack direction="horizontal" gap={1}>
           <div>High: {props.quote.h}</div>
           <div>Low: {props.quote.l}</div>
           <div>Open: {props.quote.o}</div>
           <div>Prev Close: {props.quote.pc}</div>
-          <Button disabled variant="outline-secondary" className="ms-auto mr-0">News</Button>
+          <Button disabled variant="outline-secondary" className="ms-auto mr-0">
+            <BiNews></BiNews>
+          </Button>
+          <Button disabled variant="outline-secondary">
+            <AiFillYahoo />
+          </Button>
           <Button
             href={props.companyProfile.weburl}
             variant="outline-secondary"
             target="_blank"
+            data-cy="to-website"
           >
-            Website
+            <BiLinkAlt />
           </Button>
         </Stack>
       </Row>

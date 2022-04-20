@@ -29,7 +29,7 @@ function Header(props) {
       fixed="top"
     >
       <Container fluid>
-        <Form onSubmit={onSubmit}>
+        <Form onSubmit={onSubmit} data-cy="header-search">
           <Form.Control
             type="text"
             placeholder="Enter Symbol"
@@ -37,12 +37,14 @@ function Header(props) {
             onChange={(e) => setInput([e.target.value])}
             required
             size="sm"
+            
           />
         </Form>
         <Navbar.Brand
           href="#home"
           className="ml-0"
           onClick={() => props.test()}
+          data-cy="header-brand"
         >
           <img
             alt="App Logo"
@@ -59,6 +61,7 @@ function Header(props) {
             title={
               props.user.username.hideUsername ? "User " : props.user.username + " "
             }
+            data-cy="header-user"
             id="basic-nav-dropdown"
           >
             

@@ -1,9 +1,6 @@
 import {
-  Modal,
   Row,
   Col,
-  ButtonGroup,
-  Button,
   Container,
 } from "react-bootstrap/";
 import Chart from "react-apexcharts";
@@ -14,7 +11,7 @@ import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import StockProfile from "./components/StockProfile";
 import StockPosts from "./components/StockPosts";
-import { FiEdit2, FiMenu, FiTrash2 } from "react-icons/fi";
+import WatchesModal from "./components/WatchesModal";
 import uuid from "uuid-v4";
 import axios from "axios";
 // https://react-icons.github.io/react-icons/icons?name=fi
@@ -36,16 +33,130 @@ const directionEmojis = {
 function App() {
   const online = true;
 
+  // TIMESTAMP
+  const [from, setFrom] = useState(-1);
+  const [to, setTo] = useState(-1);
+
+  // GRAPH
+  const [series, setSeries] = useState([
+    {
+      data: [],
+    },
+  ]);
+  const [seriesVol, setSeriesVol] = useState([
+    {
+      data: [],
+    },
+  ]);
+
+  // PROFILE - TO MONGO
+  const [watches, setWatches] = useState([
+    {
+      grp: "Test",
+      lists: [
+        { sym: "TSLA", quote: {} },
+        { sym: "AAPL", quote: {} },
+      ],
+    },
+    {
+      grp: "Favorite",
+      lists: [
+        { sym: "TSLA", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AMZN", quote: {} },
+      ],
+    },
+    {
+      grp: "Long",
+      lists: [
+        { sym: "MSFT", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+        { sym: "AAPL", quote: {} },
+      ],
+    },
+  ]);
+  const [currentWatchList, setCurrentWatchList] = useState(0);
+  const [watchesSettingModal, setWatchesSettingModal] = useState(false);
+  const [user] = useState({
+    username: "Thierry",
+    hideUsername: false,
+    darkMode: false,
+    defaultDiagram: 0,
+  });
+
+  // STOCK
+  const [symbol, setSymbol] = useState("");
+  const [quote, setQuote] = useState({});
+  const [companyProfile, setCompanyProfile] = useState({});
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const { c, h, l, o, pc, t } = quote;
+  const {
+    country,
+    currency,
+    exchange,
+    finnhubIndustry,
+    ipo,
+    logo,
+    marketCapitalization,
+    shareOutstanding,
+    name,
+    weburl,
+    ticker,
+  } = companyProfile;
+
   // YAHOO
   // const proxyUrl = "https://cors-anywhere.herokuapp.com/";
   // const stockUrl = `${proxyUrl}https://query1.finance.yahoo.com/v8/finance/chart/`;
-  async function getStocks() {
+
+  async function fetchGraph() {
     if (online) {
       const resolution = 1;
-      // @test
       // const f = 1650375000
       // const t = 1650398400
-
       const now = Math.floor(Date.now() / 1000);
       const marketOpen = new Date();
       marketOpen.setHours(9, 30, 0, 0);
@@ -70,12 +181,9 @@ function App() {
         f = o;
         t = now;
       }
-      console.log(new Date(f * 1000));
-      console.log(new Date(t * 1000));
-      console.log("GETTING PRICE => " + symbol);
-      console.log(
-        `${url}/stock/candle?symbol=${symbol}&resolution=${resolution}&from=${f}&to=${t}&token=${finnhubtoken}`
-      );
+      // console.log(new Date(f * 1000));
+      // console.log(new Date(t * 1000));
+      // console.log("GETTING GRAPH => " + symbol);
       const res = await axios.get(
         `${url}/stock/candle?symbol=${symbol}&resolution=${resolution}&from=${f}&to=${t}&token=${finnhubtoken}`
       );
@@ -419,125 +527,24 @@ function App() {
     }
   }
 
-  const [series, setSeries] = useState([
-    {
-      data: [],
-    },
-  ]);
-  const [seriesVol, setSeriesVol] = useState([
-    {
-      data: [],
-    },
-  ]);
-
-  // PROFILE
-  const [watches, setWatches] = useState([
-    {
-      grp: "Favorite",
-      lists: [
-        { sym: "TSLA", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AMZN", quote: {} },
-      ],
-    },
-    {
-      grp: "Finance",
-      lists: [
-        { sym: "MA", quote: {} },
-        { sym: "PYPL", quote: {} },
-        { sym: "WFC", quote: {} },
-        { sym: "TD", quote: {} },
-      ],
-    },
-    {
-      grp: "Long",
-      lists: [
-        { sym: "MSFT", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-        { sym: "AAPL", quote: {} },
-      ],
-    },
-  ]);
-  const [currentWatchList, setCurrentWatchList] = useState(0);
-  const [watchesSettingModal, setWatchesSettingModal] = useState(false);
-  const [user] = useState({
-    username: "Thierry",
-    hideUsername: false,
-    darkMode: false,
-    defaultDiagram: 0,
-  });
-
-  // STOCK
-  const [symbol, setSymbol] = useState("TSLA");
-
   useEffect(() => {
     let timeoutId;
     async function getLastestPrice() {
       console.log("(1) => useEffect.getLastestPrice " + symbol);
       try {
-        const data = await getStocks();
+        const data = await fetchGraph();
         const prices = data.t.map((timestamp, index) => ({
           x: new Date((timestamp - 3600 * 4) * 1000),
           y: [data.o[index], data.h[index], data.l[index], data.c[index]].map(
             round
           ),
         }));
-        setSeries([
-          {
-            data: prices,
-          },
-        ]);
-        setSeriesVol([
-          {
-            data: data.v,
-          },
-        ]);
+        setSeries([{ data: prices }]);
+        setSeriesVol([{ data: data.v }]);
       } catch (error) {
         console.log(error);
       }
-      timeoutId = setTimeout(getLastestPrice, 4000);
+      timeoutId = setTimeout(getLastestPrice, 17000);
     }
     getLastestPrice();
     return () => {
@@ -551,19 +558,19 @@ function App() {
       console.log("(2) => uuseEffect.getLastestListQuote " + symbol);
       try {
         await fetchListQuote(watches[currentWatchList].lists);
+        await fetchQuote();
       } catch (error) {
         console.log(error);
       }
-      timeoutId = setTimeout(getLastestListQuote, 5000);
+      timeoutId = setTimeout(getLastestListQuote, 10000);
     }
     getLastestListQuote();
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [currentWatchList]);
+  }, [currentWatchList, symbol]);
 
   useEffect(() => {
-    console.log(symbol, "- Has changed");
     fetchProfile();
     fetchQuote();
     getProfileNews();
@@ -575,26 +582,6 @@ function App() {
     fetchListQuote(watches[currentWatchList].lists);
     getProfileNews();
   }, []);
-
-  const [quote, setQuote] = useState({});
-  const [companyProfile, setCompanyProfile] = useState({});
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  const { c, h, l, o, pc, t } = quote;
-  const {
-    country,
-    currency,
-    exchange,
-    finnhubIndustry,
-    ipo,
-    logo,
-    marketCapitalization,
-    shareOutstanding,
-    name,
-    weburl,
-    ticker,
-  } = companyProfile;
 
   const watchesSettingOnclick = () => {
     setWatchesSettingModal(!watchesSettingModal);
@@ -610,6 +597,7 @@ function App() {
     mm = parseInt(mm) >= 10 ? mm : `0${mm}`;
     return `${yy}-${mm}-${dd}`;
   };
+
   let currentDt = getDate(0);
   let previousDt = getDate(2);
 
@@ -635,14 +623,13 @@ function App() {
     const res = await axios.get(
       `${url}/stock/profile2?symbol=${symbol}&token=${finnhubtoken}`
     );
-    console.log(res.data);
     setCompanyProfile(res.data);
     setLoading(false);
   };
 
   const fetchListQuote = async (list) => {
     if (online) {
-      console.log("() fetchListQuote " + list);
+      console.log("() fetchListQuote " + list + " " + symbol);
       let tempList = [...watches];
       let temp = [];
       let cache = new Map();
@@ -659,7 +646,6 @@ function App() {
           cache.set(element.sym, res.data);
         }
       }
-      console.log(temp);
       tempList[currentWatchList].lists = temp;
       setWatches(tempList);
     }
@@ -667,6 +653,7 @@ function App() {
 
   const fetchQuote = async () => {
     console.log("() fetchQuote " + symbol);
+    const currentSym = symbol;
     const res = await axios.get(
       `${url}/quote?symbol=${symbol}&token=${finnhubtoken}`
     );
@@ -685,42 +672,6 @@ function App() {
   const test = async () => {
     console.log("=========================================");
     console.log(uuid());
-    const resolution = 1;
-    const from = 1650375000;
-    const to = 1650398400;
-    console.log(new Date(from * 1000));
-    console.log(new Date(to * 1000));
-
-    const now = Math.floor(Date.now() / 1000);
-    console.log(new Date(now * 1000));
-
-    const marketOpen = new Date();
-    marketOpen.setHours(9, 30, 0, 0);
-    const o = marketOpen.getTime() / 1000;
-    console.log(new Date(o * 1000));
-
-    const marketClose = new Date();
-    marketClose.setHours(16, 0, 0, 0);
-    const c = marketClose.getTime() / 1000;
-    console.log(new Date(c * 1000));
-
-    let f = -1;
-    let t = -1;
-    if (now < o) {
-      console.log("not open yet, get yesterday");
-      f = o - 3600 * 24;
-      t = c - 3600 * 24;
-    } else if (now > c) {
-      console.log("after market");
-      f = o;
-      t = c;
-    } else {
-      console.log("market open");
-      f = o;
-      t = now;
-    }
-    console.log(new Date(f * 1000));
-    console.log(new Date(t * 1000));
   };
 
   // CHART PARAM
@@ -830,6 +781,7 @@ function App() {
               directionEmojis={directionEmojis}
             />
             <Chart
+              data-cy="quote-chart"
               style={{ padding: "0px" }}
               options={chart.options}
               series={series}
@@ -838,6 +790,7 @@ function App() {
               height="50%"
             />
             <ReactApexChart
+              data-cy="volume-chart"
               options={chartVolume.options}
               series={seriesVol}
               type="bar"
@@ -847,76 +800,15 @@ function App() {
           </Col>
         </Row>
       </Container>
-
-      {/*  */}
-      <Modal
-        id="watchListSetting"
-        show={watchesSettingModal}
-        onHide={watchesSettingOnclick}
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Watch list setting</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {watches.map((watch, index) => (
-            <div key={index}>
-              <Container>
-                <Row className="py-1">
-                  <Col xs lg="6">
-                    {watch.grp}
-                  </Col>
-                  <ButtonGroup as={Col} size="sm">
-                    <Button
-                      variant="outline-info"
-                      size="sm"
-                      onClick={() => listItemEditOnClick(index)}
-                    >
-                      <FiEdit2 />
-                    </Button>
-                    <Button
-                      variant="outline-danger"
-                      size="sm"
-                      onClick={() => listItemRemoveOnClick(index)}
-                    >
-                      <FiTrash2 />
-                    </Button>
-                  </ButtonGroup>
-
-                  <Button lg="1" as={Col} variant="list" size="sm">
-                    <FiMenu />
-                  </Button>
-                </Row>
-              </Container>
-            </div>
-          ))}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={watchesSettingOnclick}>
-            Cancel
-          </Button>
-          <Button variant="primary" onClick={watchesSettingOnclick}>
-            Save Changes
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <WatchesModal
+        watchesSettingModal={watchesSettingModal}
+        watchesSettingOnclick={watchesSettingOnclick}
+        watches={watches}
+        listItemEditOnClick={listItemEditOnClick}
+        listItemRemoveOnClick={listItemRemoveOnClick}
+      />
     </div>
   );
 }
-
-// const ExampleToast = ({ children }) => {
-//   const [show, toggleShow] = useState(true);
-
-//   return (
-//     <>
-//       {!show && <Button onClick={() => toggleShow(true)}>Show Toast</Button>}
-//       <Toast show={show} onClose={() => toggleShow(false)}>
-//         <Toast.Header>
-//           <strong className="mr-auto">React-Bootstrap</strong>
-//         </Toast.Header>
-//         <Toast.Body>{children}</Toast.Body>
-//       </Toast>
-//     </>
-//   );
-// };
 
 export default App;

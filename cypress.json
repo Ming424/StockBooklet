@@ -1,0 +1,11 @@
+{
+  "component": {
+    "testFiles": "**/*.test.{js,ts,jsx,tsx}",
+    "componentFolder": "src"
+  },
+  "scripts": {
+    "cypress:open": "cypress open"
+  },
+  "viewportWidth": 1920,
+  "viewportHeight": 1080
+}
