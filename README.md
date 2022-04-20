@@ -7,6 +7,8 @@ This is my personal project for the SOEN 491 class.
 
 # How to use
 
+[<img src="https://user-images.githubusercontent.com/37958655/164303411-bb37c888-25b9-4444-817e-57441b992055.png" width="250"/>](https://user-images.githubusercontent.com/37958655/164303411-bb37c888-25b9-4444-817e-57441b992055.png)
+
 Clone the repo\
 Get an API key from Finnhub and add it inside .env file (https://finnhub.io/)
 
