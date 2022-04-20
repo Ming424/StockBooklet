@@ -1,12 +1,88 @@
-.App {
-  /* text-align: center; */
+.sidebar-list-group {
+  /* margin-left: 0px; */
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.sidebar-list-group-item-sym {
+  font-style: normal;
+  font-weight: 700;
+  font-size: 1.1em;
 }
 
-.App-link {
-  color: #61dafb;
+.sidebar-list-group-item-price {
+  font-style: normal;
+  font-weight: 600;
+  font-size: 1.1em;
+}
+.main-header-image {
+  margin-right: 10px;
+  margin-top: 16px;
+  height: 40px;
+  width:auto;
+  -webkit-backface-visibility: hidden; 
+  -ms-transform: translateZ(0); /* IE 9 */
+  -webkit-transform: translateZ(0); /* Chrome, Safari, Opera */
+  transform: translateZ(0);
+}
+
+.news-item{
+  background-color: rgb(255, 255, 255);
+  transition: 0.3s;
+}
+
+.news-item:hover{
+  background-color: rgb(205, 205, 205);
+  cursor: pointer;
+}
+
+.main-header-symbol {
+  font-weight: 700;
+  font-size: 1.9em;
+  line-height: 15px;
+  padding-top: 15px;
+}
+
+.main-header-symbol-badge{
+  font-weight: 500;
+  font-size: 1em;
+  color: white;
+  border-radius: 4px;
+  margin-left: 6px;
+  padding: 6px; 
+  /* line-height: 15px; */
+  margin-top: 18px;
+}
+
+.main-header-price {
+  font-style: normal;
+  font-weight: 900;
+  font-size: 2.4em;
+  line-height: 23px;
+  letter-spacing: -0.02em;
+}
+
+.main-header-change {
+  position: static;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 1.4em;
+  line-height: 15px;
+  display: flex;
+  align-items: flex-end;
+  flex: none;
+  order: 1;
+  align-self: stretch;
+  flex-grow: 0;
+  margin: 0px 0px;
+}
+
+.main-header-change-green {
+  color: #0B8E00;
+}
+.main-header-change-red {
+  color: #980000;
+}
+
+.watch-list-group-item{
+  margin-right: 1px;
+  padding-top:1px;
 }
