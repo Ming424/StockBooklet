@@ -1,3 +1,20 @@
+# StockBooklet
+New age stock tracking app suit to your need!\
+![image](https://user-images.githubusercontent.com/37958655/164299965-36e3d121-12cf-409e-86a8-3223978eb43f.png)
+(Not going to well for the earning reveal 🤦)\
+Working in progress...\
+This is my personal project for the SOEN 491 class.
+
+# How to use
+
+Clone the repo\
+Get an API key from Finnhub and add it inside .env file (https://finnhub.io/)
+
+/.env\
+REACT_APP_FINNHUB_APIKEY="your_key"
+
+And the suit yourself! 🤗
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
